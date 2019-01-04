@@ -42,6 +42,7 @@ Public Function 表の全文字列をExcelに出力する(Path As String, xl_wbk
   Dim bi_tyouhyoid '
   
   ppapp.Visible = True
+  DoEvents
   Set ppPR = ppapp.Presentations.Open(Path)
 
   '出力先設定
