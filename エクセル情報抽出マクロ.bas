@@ -53,7 +53,7 @@ Sub エクセル内の情報をExcelに集約出力する(Path, 抽出先セル)
     End If
     
     DoEvents
-    Set 抽出対象エクセル = Workbooks.Open(Filename:=Path)
+    Set 抽出対象エクセル = Workbooks.Open(Filename:=Path, UpdateLinks:=False)
     
 
     Dim シート
@@ -71,7 +71,7 @@ Sub エクセル内の情報をExcelに集約出力する(Path, 抽出先セル)
         'Debug.Print (抽出先セル)
     Next シート
     
-    抽出対象エクセル.Close
+    抽出対象エクセル.Close SaveChanges:=False
     
 
 End Sub
