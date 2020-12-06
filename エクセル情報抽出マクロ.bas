@@ -1,4 +1,3 @@
-Attribute VB_Name = "Module1"
 Option Explicit
 
 Enum header
@@ -16,6 +15,7 @@ Sub エクセル情報抽出()
  Dim xl_wbk As Workbook
   
   Application.ScreenUpdating = False
+  Application.EnableEvents = False
   
   Set xl_wbk = Workbooks.Add '新規ワークブック追加
  
@@ -30,7 +30,7 @@ Sub エクセル情報抽出()
         
         For i = 1 To .ListRows.Count
             Path = .ListRows(i).Range.Value
-            Set 抽出先セル = xl_wbk.Sheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Offset(1, 0)
+            Set 抽出先セル = xl_wbk.Sheets("Sheet1").Cells(Rows.Count, header.ファイル名 + 1).End(xlUp).Offset(1, 0)
         
             '-------------------------------------------------
             Call エクセル内の情報をExcelに集約出力する(Path, 抽出先セル)  '対象のマクロを選択
@@ -40,6 +40,7 @@ Sub エクセル情報抽出()
     
     End With
   Application.ScreenUpdating = True
+  Application.EnableEvents = True
 End Sub
 
 Sub エクセル内の情報をExcelに集約出力する(Path, 抽出先セル)  '対象のマクロを選択
@@ -80,6 +81,7 @@ Sub シート内の情報を吐き出す(抽出対象シート, 抽出先セル)
 
     Call オブジェクト内の情報を抽出する(抽出対象シート, 抽出先セル)
     Call セル内の情報を抽出する(抽出対象シート, 抽出先セル)
+    Call 空白情報を仮埋めをする
 End Sub
 
 Function オブジェクト内の情報を抽出する(抽出対象シート, 抽出先セル)
@@ -94,12 +96,12 @@ Function オブジェクト内の情報を抽出する(抽出対象シート, �
         追加行 = 0
         Dim 図形 As Shape
         For Each 図形 In s_抽出対象シート.Shapes
+            
             If 図形.TextFrame2.HasText Then
-                
-                
+                                         
+                On Error Resume Next
                 抽出先セル.Offset(追加行, header.テキスト).Value = 図形.TextFrame2.TextRange.Text
                 
-              
                 追加行 = 追加行 + 1
             
                 抽出先セル.Offset(追加行, header.ファイル名).FormulaR1C1 = "=R[-1]C"
@@ -144,4 +146,12 @@ Function セル内の情報を抽出する(抽出対象シート, 抽出先セ�
 
                 抽出先セル.Offset(追加行, header.ファイル名).Value = ""
                 抽出先セル.Offset(追加行, header.シート名).Value = ""
+End Function
+
+Function 空白情報を仮埋めをする()
+    'もしエラー値を読み取ってしまい、
+    'ファイル名やシートが空になった場合、上の内容で仮埋め
+    On Error Resume Next
+    Columns.SpecialCells(xlCellTypeBlanks).FormulaR1C1 = "=R[-1]C"
+
 End Function
